@@ -7,7 +7,7 @@ import Header from './src/components/Header';
 
 export type MainStackParamList = {
   List: undefined;
-  Details: undefined;
+  Details: {id: string};
 };
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
