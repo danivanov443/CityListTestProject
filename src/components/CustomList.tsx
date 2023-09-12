@@ -1,53 +1,78 @@
 import React, {useRef, useState} from 'react';
 import {
   ActivityIndicator,
+  Button,
   FlatList,
   Keyboard,
   TextInput,
   View,
 } from 'react-native';
+import {PAGE_SIZE} from '../constants';
 import {City} from '../types';
 import CustomListItem from './CustomListItem';
 
 type Props = {
   data?: City[];
+  currentPage: number;
   onItemPress?: (city: City) => void;
-  onSearchSubmit?: (searchQuery: string) => void;
+  onSearchSubmit?: (searchQuery?: string) => void;
+  onRefresh?: () => void;
 };
 
 const ITEM_HEIGHT = 43;
 
-export default function CustomList({data, onItemPress, onSearchSubmit}: Props) {
+export default function CustomList({
+  data,
+  currentPage = 1,
+  onItemPress,
+  onSearchSubmit,
+  onRefresh,
+}: Props) {
   const [searchQuery, setSearchQuery] = useState<string>();
   const flatListRef = useRef<FlatList>(null);
 
   const onTextInputSubmit = () => {
     const trimmedSearchQuery = searchQuery?.trim();
     const searchNumber = Number(trimmedSearchQuery);
-    if (searchNumber >= 1 && searchNumber <= 50) {
+
+    const minLimit = (currentPage - 1) * PAGE_SIZE + 1;
+    const maxLimit = currentPage * PAGE_SIZE;
+
+    console.log(minLimit, maxLimit);
+
+    if (searchNumber >= minLimit && searchNumber <= maxLimit) {
+      console.log(searchNumber - 1 - (currentPage - 1) * PAGE_SIZE);
       const onKeyboardDidHide = () => {
         Keyboard.removeAllListeners('keyboardDidHide');
         flatListRef.current?.scrollToIndex({
-          index: searchNumber - 1,
+          index: searchNumber - 1 - (currentPage - 1) * PAGE_SIZE,
         });
       };
 
       Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
     } else {
-      if (trimmedSearchQuery) {
-        onSearchSubmit?.(trimmedSearchQuery);
-      }
+      onSearchSubmit?.(trimmedSearchQuery);
     }
   };
 
   return (
     <View style={{flex: 1}}>
-      <TextInput
-        style={{margin: 8, backgroundColor: 'white'}}
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        onSubmitEditing={onTextInputSubmit}
-      />
+      <View
+        style={{
+          backgroundColor: 'white',
+          flexDirection: 'row',
+          alignItems: 'center',
+          margin: 4,
+          padding: 4,
+        }}>
+        <TextInput
+          style={{flex: 1, margin: 2}}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onSubmitEditing={onTextInputSubmit}
+        />
+        <Button title="SEARCH" onPress={onTextInputSubmit} />
+      </View>
 
       {data?.length ? (
         <FlatList
@@ -59,9 +84,11 @@ export default function CustomList({data, onItemPress, onSearchSubmit}: Props) {
             offset: ITEM_HEIGHT * index,
             index,
           })}
+          onRefresh={onRefresh}
+          refreshing={false}
           renderItem={({item, index}) => (
             <CustomListItem
-              index={index + 1}
+              index={(currentPage - 1) * PAGE_SIZE + index + 1}
               city={item}
               onPress={onItemPress}
             />
