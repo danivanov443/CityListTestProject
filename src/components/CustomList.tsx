@@ -1,15 +1,9 @@
-import React, {useRef, useState} from 'react';
-import {
-  ActivityIndicator,
-  Button,
-  FlatList,
-  Keyboard,
-  TextInput,
-  View,
-} from 'react-native';
+import React, {useRef} from 'react';
+import {ActivityIndicator, FlatList, Keyboard, View} from 'react-native';
 import {PAGE_SIZE} from '../constants';
 import {City} from '../types';
 import CustomListItem from './CustomListItem';
+import CustomSearchBar from './SearchBar';
 
 type Props = {
   data?: City[];
@@ -28,10 +22,9 @@ export default function CustomList({
   onSearchSubmit,
   onRefresh,
 }: Props) {
-  const [searchQuery, setSearchQuery] = useState<string>();
   const flatListRef = useRef<FlatList>(null);
 
-  const onTextInputSubmit = () => {
+  const onTextInputSubmit = (searchQuery?: string) => {
     const trimmedSearchQuery = searchQuery?.trim();
     const searchNumber = Number(trimmedSearchQuery);
 
@@ -57,23 +50,7 @@ export default function CustomList({
 
   return (
     <View style={{flex: 1}}>
-      <View
-        style={{
-          backgroundColor: 'white',
-          flexDirection: 'row',
-          alignItems: 'center',
-          margin: 4,
-          padding: 4,
-        }}>
-        <TextInput
-          style={{flex: 1, margin: 2}}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          onSubmitEditing={onTextInputSubmit}
-        />
-        <Button title="SEARCH" onPress={onTextInputSubmit} />
-      </View>
-
+      <CustomSearchBar onSearchSubmit={onTextInputSubmit} />
       {data?.length ? (
         <FlatList
           style={{flex: 1}}
