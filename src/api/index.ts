@@ -51,6 +51,7 @@ export async function getCities(
     Toast.show({
       type: 'error',
       text1: (error as Error).message,
+      position: 'bottom',
     });
   }
 }

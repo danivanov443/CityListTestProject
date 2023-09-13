@@ -6,6 +6,7 @@ import ListScreen from './src/screens/ListScreen';
 import DetailScreen from './src/screens/DetailsScreen';
 import Header from './src/components/Header';
 import {City} from './src/types';
+import {toastConfig} from './src/toastConfig';
 
 export type MainStackParamList = {
   List: undefined;
@@ -35,7 +36,7 @@ function App(): JSX.Element {
           />
         </MainStack.Navigator>
       </NavigationContainer>
-      <Toast />
+      <Toast config={toastConfig} />
     </>
   );
 }
