@@ -4,7 +4,7 @@ import {View} from 'react-native';
 import {MainStackParamList} from '../../../App';
 import {getCities} from '../../api';
 import CustomList from './components/CustomList';
-import {PAGE_SIZE} from '../../constants';
+import {PAGE_SIZE} from '../../constants/constants';
 import {City} from '../../types';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'List'>;

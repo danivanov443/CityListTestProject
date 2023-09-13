@@ -1,10 +1,11 @@
 import React, {useRef, useState} from 'react';
-import {FlatList, Keyboard, View} from 'react-native';
-import {PAGE_SIZE} from '../../../../constants';
+import {EmitterSubscription, FlatList, Keyboard, View} from 'react-native';
+import {PAGE_SIZE} from '../../../../constants/constants';
 import {City} from '../../../../types';
 import CircularLoader from '../../../../components/CircularLoader';
 import CustomListItem, {ITEM_HEIGHT} from '../CustomListItem';
 import SearchBar from '../../../../components/SearchBar';
+import {useKeyboard} from '../../../../hooks/useKeyboard';
 
 type Props = {
   data?: City[];
@@ -24,6 +25,8 @@ export default function CustomList({
   const [currentSearchQuery, setCurrentSearchQuery] = useState<string>();
   const flatListRef = useRef<FlatList>(null);
 
+  const {isKeyboardVisible} = useKeyboard();
+
   const handleRefresh = () => {
     if (onRefresh) {
       setCurrentSearchQuery(undefined);
@@ -38,18 +41,26 @@ export default function CustomList({
     const minLimit = (currentPage - 1) * PAGE_SIZE + 1;
     const maxLimit = currentPage * PAGE_SIZE;
 
-    console.log(minLimit, maxLimit);
-
     if (searchNumber >= minLimit && searchNumber <= maxLimit) {
-      console.log(searchNumber - 1 - (currentPage - 1) * PAGE_SIZE);
-      const onKeyboardDidHide = () => {
-        Keyboard.removeAllListeners('keyboardDidHide');
+      if (isKeyboardVisible) {
+        let keyboardSubscription: EmitterSubscription;
+
+        const onKeyboardDidHide = () => {
+          keyboardSubscription.remove();
+          flatListRef.current?.scrollToIndex({
+            index: searchNumber - 1 - (currentPage - 1) * PAGE_SIZE,
+          });
+        };
+
+        keyboardSubscription = Keyboard.addListener(
+          'keyboardDidHide',
+          onKeyboardDidHide,
+        );
+      } else {
         flatListRef.current?.scrollToIndex({
           index: searchNumber - 1 - (currentPage - 1) * PAGE_SIZE,
         });
-      };
-
-      Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
+      }
     } else {
       onSearchSubmit?.(trimmedSearchQuery);
     }
