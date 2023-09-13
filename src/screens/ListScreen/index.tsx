@@ -2,8 +2,8 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {MainStackParamList} from '../../../App';
-import {getData} from '../../api';
-import CustomList from '../../components/CustomList';
+import {getCities} from '../../api';
+import CustomList from './components/CustomList';
 import {PAGE_SIZE} from '../../constants';
 import {City} from '../../types';
 
@@ -11,7 +11,7 @@ type Props = NativeStackScreenProps<MainStackParamList, 'List'>;
 
 export default function ListScreen({navigation}: Props) {
   const [cityData, setCityData] = useState<City[]>();
-  const [currentPage, setCurrentPage] = useState(20);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const loadData = async (
     searchQuery?: string,
@@ -19,22 +19,22 @@ export default function ListScreen({navigation}: Props) {
     pageSize?: number,
   ) => {
     setCityData([]);
-    const data = await getData(pageNumber, pageSize, searchQuery);
+    const data = await getCities(pageNumber, pageSize, searchQuery);
     setCityData(data);
   };
 
-  const onRefresh = () => {
+  const handleRefresh = () => {
     setCurrentPage(1);
     loadData(undefined, currentPage, PAGE_SIZE);
   };
 
-  const onSearchSubmit = (searchQuery?: string) => {
+  const handleSearchSubmit = (searchQuery?: string) => {
     setCurrentPage(1);
     loadData(searchQuery, currentPage, PAGE_SIZE);
   };
 
-  const onItemPress = (city: City) => {
-    navigation.navigate('Details', {id: city.id});
+  const handleItemPress = (city: City) => {
+    navigation.navigate('Details', {city});
   };
 
   useEffect(() => {
@@ -46,9 +46,9 @@ export default function ListScreen({navigation}: Props) {
       <CustomList
         currentPage={currentPage}
         data={cityData}
-        onItemPress={onItemPress}
-        onSearchSubmit={onSearchSubmit}
-        onRefresh={onRefresh}
+        onItemPress={handleItemPress}
+        onSearchSubmit={handleSearchSubmit}
+        onRefresh={handleRefresh}
       />
     </View>
   );

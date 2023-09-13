@@ -1,17 +1,17 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React from 'react';
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
 import {MainStackParamList} from '../../../App';
+import CityDetails from './components/CityDetails';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'Details'>;
 
 export default function DetailScreen({route}: Props) {
-  const id = route.params.id;
+  const city = route.params.city;
 
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text>Detail Screen</Text>
-      <Text>{id}</Text>
+      <CityDetails city={city} />
     </View>
   );
 }

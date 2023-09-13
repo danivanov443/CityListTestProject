@@ -1,9 +1,10 @@
 import React, {useRef, useState} from 'react';
-import {ActivityIndicator, FlatList, Keyboard, View} from 'react-native';
-import {PAGE_SIZE} from '../constants';
-import {City} from '../types';
-import CustomListItem from './CustomListItem';
-import SearchBar from './SearchBar';
+import {FlatList, Keyboard, View} from 'react-native';
+import {PAGE_SIZE} from '../../../../constants';
+import {City} from '../../../../types';
+import CircularLoader from '../../../../components/CircularLoader';
+import CustomListItem, {ITEM_HEIGHT} from '../CustomListItem';
+import SearchBar from '../../../../components/SearchBar';
 
 type Props = {
   data?: City[];
@@ -13,8 +14,6 @@ type Props = {
   onRefresh?: () => void;
 };
 
-const ITEM_HEIGHT = 43;
-
 export default function CustomList({
   data,
   currentPage = 1,
@@ -22,8 +21,15 @@ export default function CustomList({
   onSearchSubmit,
   onRefresh,
 }: Props) {
-  const [searchQuery, setSearchQuery] = useState<string>();
+  const [currentSearchQuery, setCurrentSearchQuery] = useState<string>();
   const flatListRef = useRef<FlatList>(null);
+
+  const handleRefresh = () => {
+    if (onRefresh) {
+      setCurrentSearchQuery(undefined);
+      onRefresh();
+    }
+  };
 
   const onTextInputSubmit = (searchQuery?: string) => {
     const trimmedSearchQuery = searchQuery?.trim();
@@ -53,14 +59,14 @@ export default function CustomList({
     <View
       style={{
         flex: 1,
-        backgroundColor: 'grey',
+        backgroundColor: 'white',
         marginTop: 8,
         borderTopEndRadius: 16,
         borderTopStartRadius: 16,
       }}>
       <SearchBar
-        value={searchQuery}
-        onChangeText={setSearchQuery}
+        value={currentSearchQuery}
+        onChangeText={setCurrentSearchQuery}
         onSearchSubmit={onTextInputSubmit}
       />
       {data?.length ? (
@@ -73,7 +79,7 @@ export default function CustomList({
             offset: ITEM_HEIGHT * index,
             index,
           })}
-          onRefresh={onRefresh}
+          onRefresh={handleRefresh}
           refreshing={false}
           keyExtractor={(item: City) => item.id}
           renderItem={({item, index}) => (
@@ -85,9 +91,7 @@ export default function CustomList({
           )}
         />
       ) : (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <ActivityIndicator />
-        </View>
+        <CircularLoader />
       )}
     </View>
   );
