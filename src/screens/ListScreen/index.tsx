@@ -5,13 +5,43 @@ import {MainStackParamList} from '../../../App';
 import {getCities} from '../../api';
 import CustomList from './components/CustomList';
 import {PAGE_SIZE} from '../../constants/constants';
-import {City} from '../../types';
+import {City, CustomListAction} from '../../types';
+import IconButton from '../../components/IconButton';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'List'>;
 
 export default function ListScreen({navigation}: Props) {
+  const [isMultiselect, setIsMultiselect] = useState(false);
   const [cityData, setCityData] = useState<City[]>();
   const [currentPage, setCurrentPage] = useState(1);
+
+  const singleItemActions: CustomListAction[] = [
+    {
+      name: 'Copy',
+      icon: 'content-copy',
+      onPress: () => console.log('Copy'),
+    },
+    {
+      name: 'Edit',
+      icon: 'edit',
+      onPress: () => console.log('Edit'),
+    },
+    {
+      name: 'View',
+      icon: 'preview',
+      onPress: () => console.log('View'),
+    },
+    // {
+    //   name: 'Like',
+    //   icon: 'favorite',
+    //   onPress: () => console.log('Like'),
+    // },
+    // {
+    //   name: 'Delete',
+    //   icon: 'delete',
+    //   onPress: () => console.log('Delete'),
+    // },
+  ];
 
   const loadData = async (
     searchQuery?: string,
@@ -41,6 +71,20 @@ export default function ListScreen({navigation}: Props) {
     loadData(undefined, currentPage, PAGE_SIZE);
   }, [currentPage]);
 
+  useEffect(() => {
+    if (isMultiselect) {
+      navigation.setOptions({
+        headerLeft: () => <IconButton icon="close" />,
+        headerRight: () => <IconButton icon="more-vert" />,
+      });
+    } else {
+      navigation.setOptions({
+        headerLeft: undefined,
+        headerRight: undefined,
+      });
+    }
+  }, [navigation, isMultiselect]);
+
   return (
     <View style={{flex: 1}}>
       <CustomList
@@ -49,6 +93,7 @@ export default function ListScreen({navigation}: Props) {
         onItemPress={handleItemPress}
         onSearchSubmit={handleSearchSubmit}
         onRefresh={handleRefresh}
+        actions={singleItemActions}
       />
     </View>
   );

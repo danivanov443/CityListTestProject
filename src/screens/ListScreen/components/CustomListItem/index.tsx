@@ -38,6 +38,7 @@ export const styles = StyleSheet.create({
   },
   customListItemWrapper: {
     paddingHorizontal: 8,
+    backgroundColor: 'white',
   },
   indexText: {
     fontSize: 14,

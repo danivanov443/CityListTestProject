@@ -30,3 +30,9 @@ export type CityRaw = {
   latitude: string;
   'longitude:': string;
 };
+
+export type CustomListAction = {
+  name: string;
+  icon: string;
+  onPress?: () => void;
+};
