@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message';
 import Header from '../../components/Header/Header';
 import HeaderMenu from './components/HeaderMenu';
 import {BackHandler} from 'react-native';
+import {styles} from './styles';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'List'>;
 
@@ -381,7 +382,7 @@ export default function ListScreen({navigation}: Props) {
   }, [navigation, isMultiselect, selectedCities?.length]);
 
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.listScreenView}>
       <CustomList
         currentPage={currentPage}
         data={cityData}

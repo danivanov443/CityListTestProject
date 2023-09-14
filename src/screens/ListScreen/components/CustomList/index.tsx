@@ -15,8 +15,8 @@ import SearchBar from '../../../../components/SearchBar';
 import {useKeyboard} from '../../../../hooks/useKeyboard';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import CustomListSwipeActions from '../CustomListSwipeActions';
-import {colors} from '../../../../constants/colors';
 import {ProgressBar} from '@react-native-community/progress-bar-android';
+import {styles} from './styles';
 
 type Props = {
   data?: City[];
@@ -79,7 +79,7 @@ export default function CustomList({
         const onKeyboardDidHide = () => {
           keyboardSubscription.remove();
           flatListRef.current?.scrollToIndex({
-            index: searchNumber - 1 - (currentPage - 1) * PAGE_SIZE,
+            index: searchNumber - 1,
           });
         };
 
@@ -89,7 +89,7 @@ export default function CustomList({
         );
       } else {
         flatListRef.current?.scrollToIndex({
-          index: searchNumber - 1 - (currentPage - 1) * PAGE_SIZE,
+          index: searchNumber - 1,
         });
       }
     } else {
@@ -101,58 +101,36 @@ export default function CustomList({
     swipeListRef.current?.closeAllOpenRows();
   };
 
-  // const renderOnSwipeActions = (actions: any[]) => (
-  //   <View style={{flexDirection: 'row'}}>
-  //     {actions.map(action => (
-  //       <Text>1</Text>
-  //     ))}
-  //   </View>
-  // );
-
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: 'white',
-        marginTop: 8,
-        borderTopEndRadius: 16,
-        borderTopStartRadius: 16,
-      }}>
+    <View style={styles.customListWrapper}>
       <SearchBar
         value={currentSearchQuery}
         onChangeText={setCurrentSearchQuery}
         onSearchSubmit={onTextInputSubmit}
       />
-      <View
-        style={{
-          marginHorizontal: 8,
-        }}>
+      <View style={styles.progressBarWrapper}>
         <ProgressBar
           indeterminate
           styleAttr="Horizontal"
-          style={{opacity: showProgressBar ? 1 : 0}}
+          style={
+            showProgressBar ? styles.progressBarShow : styles.progressBarHide
+          }
         />
       </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          paddingBottom: 8,
-          paddingStart: 4,
-        }}>
+      <View style={styles.switchWrapper}>
         <Switch
           value={isSwipeList}
           onChange={handleModeChange}
-          style={{marginEnd: 8}}
+          style={styles.switch}
         />
-        <Text style={{color: colors.textColor, fontSize: 12}}>
+        <Text style={styles.switchText}>
           {`Режим: ${isSwipeList ? 'SwipeList' : 'FlatList'}`}
         </Text>
       </View>
       {data?.length ? (
         isSwipeList ? (
           <SwipeListView
-            style={{flex: 1, backgroundColor: '#EEEEEE'}}
+            style={styles.list}
             ref={swipeListRef}
             data={data}
             getItemLayout={(_data: any, index: number) => ({
@@ -172,9 +150,9 @@ export default function CustomList({
                 onPress={onItemPress}
               />
             )}
-            renderHiddenItem={(data, _rowMap) => (
+            renderHiddenItem={(itemData, _rowMap) => (
               <CustomListSwipeActions
-                city={data.item}
+                city={itemData.item}
                 actions={actions}
                 callback={handleCloseSwipedItem}
               />
@@ -184,7 +162,7 @@ export default function CustomList({
           />
         ) : (
           <FlatList
-            style={{flex: 1}}
+            style={styles.list}
             ref={flatListRef}
             data={data}
             getItemLayout={(_data, index) => ({

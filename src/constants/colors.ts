@@ -1,4 +1,5 @@
 export const colors = {
+  bgColor: '#EEEEEE',
   lightGrey: '#DDDDDD',
   mediumGrey: '#777777',
   darkGrey: '#333333',
