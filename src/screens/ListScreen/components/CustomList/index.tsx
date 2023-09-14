@@ -17,6 +17,7 @@ import {SwipeListView} from 'react-native-swipe-list-view';
 import CustomListSwipeActions from '../CustomListSwipeActions';
 import {styles} from './styles';
 import HorizontalLoader from '../../../../components/HorizontalLoader';
+import NoResults from '../NoResults';
 
 type Props = {
   data?: City[];
@@ -178,6 +179,8 @@ export default function CustomList({
             )}
           />
         )
+      ) : data?.length === 0 ? (
+        <NoResults />
       ) : (
         <CircularLoader />
       )}

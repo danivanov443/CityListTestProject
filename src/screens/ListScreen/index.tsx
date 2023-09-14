@@ -275,9 +275,9 @@ export default function ListScreen({navigation}: Props) {
     pageNumber?: number,
     pageSize?: number,
   ) => {
-    setCityData([]);
+    setCityData(undefined);
     const data = await getCities(pageNumber, pageSize, searchQuery);
-    setCityData(data);
+    setCityData(data ?? []);
   };
 
   const handleRefresh = () => {
