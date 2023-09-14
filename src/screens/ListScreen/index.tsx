@@ -11,12 +11,14 @@ import FullScreenLoader from './components/FullScreenLoader';
 import Toast from 'react-native-toast-message';
 import Header from '../../components/Header/Header';
 import HeaderMenu from './components/HeaderMenu';
+import {BackHandler} from 'react-native';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'List'>;
 
 export default function ListScreen({navigation}: Props) {
   const [isMultiselect, setIsMultiselect] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [shouldShowActionMenu, setShouldShowActionMenu] = useState(false);
   const [cityData, setCityData] = useState<City[]>();
   const [selectedCities, setSelectedCities] = useState<City[]>();
@@ -266,7 +268,7 @@ export default function ListScreen({navigation}: Props) {
     },
   ];
 
-  const loadData = async (
+  const loadInitialData = async (
     searchQuery?: string,
     pageNumber?: number,
     pageSize?: number,
@@ -279,12 +281,23 @@ export default function ListScreen({navigation}: Props) {
   const handleRefresh = () => {
     handleQuitMultiselect();
     setCurrentPage(1);
-    loadData(undefined, currentPage, PAGE_SIZE);
+    loadInitialData(undefined, 1, PAGE_SIZE);
+  };
+
+  const handleEndReached = async (searchQuery?: string) => {
+    setIsFetchingMore(true);
+    const data = await getCities(currentPage + 1, PAGE_SIZE, searchQuery);
+
+    if (data) {
+      setCityData(prev => prev && [...prev, ...data]);
+      setCurrentPage(prev => prev + 1);
+    }
+    setIsFetchingMore(false);
   };
 
   const handleSearchSubmit = (searchQuery?: string) => {
     setCurrentPage(1);
-    loadData(searchQuery, currentPage, PAGE_SIZE);
+    loadInitialData(searchQuery, 1, PAGE_SIZE);
   };
 
   const handleItemPress = (city: City) => {
@@ -324,8 +337,26 @@ export default function ListScreen({navigation}: Props) {
   };
 
   useEffect(() => {
-    loadData(undefined, currentPage, PAGE_SIZE);
-  }, [currentPage]);
+    loadInitialData(undefined, 1, PAGE_SIZE);
+  }, []);
+
+  useEffect(() => {
+    const onBackPress = () => {
+      if (isMultiselect) {
+        handleQuitMultiselect();
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    const subscription = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress,
+    );
+
+    return () => subscription.remove();
+  }, [isMultiselect]);
 
   useEffect(() => {
     if (isMultiselect) {
@@ -355,12 +386,14 @@ export default function ListScreen({navigation}: Props) {
         currentPage={currentPage}
         data={cityData}
         selectedData={selectedCities}
+        actions={singleItemActions}
+        showProgressBar={isFetchingMore}
         onItemPress={handleItemPress}
         onItemLongPress={handleItemLongPress}
         onSearchSubmit={handleSearchSubmit}
         onRefresh={handleRefresh}
         onModeChange={handleQuitMultiselect}
-        actions={singleItemActions}
+        onEndReached={handleEndReached}
       />
       {isProcessing && <FullScreenLoader />}
       {shouldShowActionMenu && (

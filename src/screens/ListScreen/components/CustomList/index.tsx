@@ -16,29 +16,34 @@ import {useKeyboard} from '../../../../hooks/useKeyboard';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import CustomListSwipeActions from '../CustomListSwipeActions';
 import {colors} from '../../../../constants/colors';
+import {ProgressBar} from '@react-native-community/progress-bar-android';
 
 type Props = {
   data?: City[];
   selectedData?: City[];
   currentPage: number;
+  actions?: CustomListAction[];
+  showProgressBar?: boolean;
   onItemPress?: (city: City) => void;
   onItemLongPress?: (city: City) => void;
   onSearchSubmit?: (searchQuery?: string) => void;
   onRefresh?: () => void;
+  onEndReached?: (searchQuery?: string) => void;
   onModeChange?: () => void;
-  actions?: CustomListAction[];
 };
 
 export default function CustomList({
   data,
   selectedData,
   currentPage = 1,
+  actions,
+  showProgressBar,
   onItemPress,
   onItemLongPress,
   onSearchSubmit,
   onRefresh,
+  onEndReached,
   onModeChange,
-  actions,
 }: Props) {
   const [isSwipeList, setIsSwipeList] = useState(false);
   const [currentSearchQuery, setCurrentSearchQuery] = useState<string>();
@@ -64,7 +69,7 @@ export default function CustomList({
     const trimmedSearchQuery = searchQuery?.trim();
     const searchNumber = Number(trimmedSearchQuery);
 
-    const minLimit = (currentPage - 1) * PAGE_SIZE + 1;
+    const minLimit = 1;
     const maxLimit = currentPage * PAGE_SIZE;
 
     if (searchNumber >= minLimit && searchNumber <= maxLimit && !isSwipeList) {
@@ -120,6 +125,16 @@ export default function CustomList({
       />
       <View
         style={{
+          marginHorizontal: 8,
+        }}>
+        <ProgressBar
+          indeterminate
+          styleAttr="Horizontal"
+          style={{opacity: showProgressBar ? 1 : 0}}
+        />
+      </View>
+      <View
+        style={{
           flexDirection: 'row',
           alignItems: 'center',
           paddingBottom: 8,
@@ -147,10 +162,12 @@ export default function CustomList({
             })}
             onRefresh={handleRefresh}
             refreshing={false}
+            onEndReached={() => onEndReached?.(currentSearchQuery)}
+            onEndReachedThreshold={1}
             keyExtractor={(item: City) => item.id}
             renderItem={({item, index}) => (
               <CustomListItem
-                index={(currentPage - 1) * PAGE_SIZE + index + 1}
+                index={index + 1}
                 city={item}
                 onPress={onItemPress}
               />
@@ -176,12 +193,14 @@ export default function CustomList({
               index,
             })}
             onRefresh={handleRefresh}
+            onEndReached={() => onEndReached?.(currentSearchQuery)}
+            onEndReachedThreshold={1}
             refreshing={false}
             keyExtractor={(item: City) => item.id}
             renderItem={({item, index}) => (
               <CustomListItem
                 selected={selectedIds?.includes(item.id)}
-                index={(currentPage - 1) * PAGE_SIZE + index + 1}
+                index={index + 1}
                 city={item}
                 onPress={onItemPress}
                 onLongPress={onItemLongPress}

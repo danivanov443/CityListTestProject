@@ -15,7 +15,8 @@ export default function HeaderMenu({actions, callback}: Props) {
             width: '100%',
             borderTopWidth: index === 0 ? 0 : 1,
             borderColor: colors.lightGrey,
-          }}>
+          }}
+          key={action.name}>
           <TouchableOpacity
             style={{
               paddingHorizontal: 4,
