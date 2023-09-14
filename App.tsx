@@ -24,7 +24,7 @@ function App(): JSX.Element {
             name="List"
             component={ListScreen}
             options={{
-              headerTitle: () => <Header text={'test'} />,
+              headerTitle: () => <Header />,
               headerTitleAlign: 'center',
             }}
           />
@@ -32,7 +32,7 @@ function App(): JSX.Element {
             name="Details"
             component={DetailScreen}
             options={{
-              headerTitle: () => <Header text={'test'} />,
+              headerTitle: () => <Header />,
               headerTitleAlign: 'center',
             }}
           />

@@ -9,23 +9,30 @@ import {City, CustomListAction} from '../../types';
 import IconButton from '../../components/IconButton';
 import FullScreenLoader from './components/FullScreenLoader';
 import Toast from 'react-native-toast-message';
+import Header from '../../components/Header/Header';
+import HeaderMenu from './components/HeaderMenu';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'List'>;
 
 export default function ListScreen({navigation}: Props) {
   const [isMultiselect, setIsMultiselect] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [shouldShowActionMenu, setShouldShowActionMenu] = useState(false);
   const [cityData, setCityData] = useState<City[]>();
+  const [selectedCities, setSelectedCities] = useState<City[]>();
   const [currentPage, setCurrentPage] = useState(1);
 
   const placeholderAction = () =>
     new Promise<void>(resolve => {
       setTimeout(() => {
         resolve();
-      }, Math.floor(Math.random() * 5 + 1) * 500);
+      }, Math.floor(Math.random() * 3 + 1) * 500);
     });
 
   const onCopyItemPress = (city: City, callback?: () => void) => {
+    if (isProcessing) {
+      return;
+    }
     setIsProcessing(true);
     placeholderAction()
       .then(() => {
@@ -45,6 +52,9 @@ export default function ListScreen({navigation}: Props) {
   };
 
   const onEditItemPress = (city: City, callback?: () => void) => {
+    if (isProcessing) {
+      return;
+    }
     setIsProcessing(true);
     placeholderAction()
       .then(() => {
@@ -64,6 +74,9 @@ export default function ListScreen({navigation}: Props) {
   };
 
   const onViewItemPress = (city: City, callback?: () => void) => {
+    if (isProcessing) {
+      return;
+    }
     setIsProcessing(true);
     placeholderAction()
       .then(() => {
@@ -83,6 +96,9 @@ export default function ListScreen({navigation}: Props) {
   };
 
   const onLikeItemPress = (city: City, callback?: () => void) => {
+    if (isProcessing) {
+      return;
+    }
     setIsProcessing(true);
     placeholderAction()
       .then(() => {
@@ -102,6 +118,9 @@ export default function ListScreen({navigation}: Props) {
   };
 
   const onDeleteItemPress = (city: City, callback?: () => void) => {
+    if (isProcessing) {
+      return;
+    }
     Alert.alert('Удалить элемент', `Вы точно хотите удалить ${city.title}?`, [
       {
         text: 'Нет',
@@ -136,29 +155,114 @@ export default function ListScreen({navigation}: Props) {
 
   const singleItemActions: CustomListAction[] = [
     {
-      name: 'Copy',
+      name: 'Копировать',
       icon: 'content-copy',
-      onPress: onCopyItemPress,
+      onPress: selectedCities
+        ? () => onCopyItemPress(selectedCities[0])
+        : onCopyItemPress,
     },
     {
-      name: 'Edit',
+      name: 'Редактировать',
       icon: 'edit',
-      onPress: onEditItemPress,
+      onPress: selectedCities
+        ? () => onEditItemPress(selectedCities[0])
+        : onEditItemPress,
     },
     {
-      name: 'View',
+      name: 'Просмотреть',
       icon: 'preview',
-      onPress: onViewItemPress,
+      onPress: selectedCities
+        ? () => onViewItemPress(selectedCities[0])
+        : onViewItemPress,
     },
     {
-      name: 'Like',
+      name: 'Добавить в избранное',
       icon: 'favorite',
-      onPress: onLikeItemPress,
+      onPress: selectedCities
+        ? () => onLikeItemPress(selectedCities[0])
+        : onLikeItemPress,
     },
     {
-      name: 'Delete',
+      name: 'Удалить',
       icon: 'delete',
-      onPress: onDeleteItemPress,
+      onPress: selectedCities
+        ? () => onDeleteItemPress(selectedCities[0])
+        : onDeleteItemPress,
+    },
+  ];
+
+  const onLikeItemsPress = (cities: City[], callback?: () => void) => {
+    if (isProcessing) {
+      return;
+    }
+    setIsProcessing(true);
+    placeholderAction()
+      .then(() => {
+        console.log(`Элементов добавлено в избранное: ${cities.length}`);
+      })
+      .catch(() => {
+        Toast.show({
+          type: 'error',
+          text1: 'Ошибка добавления в избранное',
+          position: 'bottom',
+        });
+      })
+      .finally(() => {
+        setIsProcessing(false);
+        callback?.();
+      });
+  };
+
+  const onDeleteItemsPress = (cities: City[], callback?: () => void) => {
+    if (isProcessing) {
+      return;
+    }
+    Alert.alert(
+      'Удалить несколько элементов',
+      'Вы точно хотите удалить выбранные элементы?',
+      [
+        {
+          text: 'Нет',
+          onPress: () => {
+            callback?.();
+          },
+          style: 'cancel',
+        },
+        {
+          text: 'Да',
+          onPress: () => {
+            setIsProcessing(true);
+            placeholderAction()
+              .then(() => {
+                console.log(`Элементов удалено: ${cities.length}`);
+              })
+              .catch(() => {
+                Toast.show({
+                  type: 'error',
+                  text1: 'Ошибка удаления',
+                  position: 'bottom',
+                });
+              })
+              .finally(() => {
+                setIsProcessing(false);
+                callback?.();
+              });
+          },
+        },
+      ],
+    );
+  };
+
+  const multipleItemActions: CustomListAction[] = [
+    {
+      name: 'Добавить в избранное',
+      icon: 'favorite',
+      onPress: () => selectedCities && onLikeItemsPress(selectedCities),
+    },
+    {
+      name: 'Удалить',
+      icon: 'delete',
+      onPress: () => selectedCities && onDeleteItemsPress(selectedCities),
     },
   ];
 
@@ -173,6 +277,7 @@ export default function ListScreen({navigation}: Props) {
   };
 
   const handleRefresh = () => {
+    handleQuitMultiselect();
     setCurrentPage(1);
     loadData(undefined, currentPage, PAGE_SIZE);
   };
@@ -183,7 +288,39 @@ export default function ListScreen({navigation}: Props) {
   };
 
   const handleItemPress = (city: City) => {
-    navigation.navigate('Details', {city});
+    if (!isMultiselect) {
+      navigation.navigate('Details', {city});
+    } else {
+      if (selectedCities?.some(value => value.id === city.id)) {
+        const filteredCities = selectedCities.filter(
+          value => value.id !== city.id,
+        );
+        if (filteredCities.length === 0) {
+          handleQuitMultiselect();
+        } else {
+          setSelectedCities(filteredCities);
+        }
+      } else {
+        selectedCities && setSelectedCities([...selectedCities, city]);
+      }
+    }
+  };
+
+  const handleItemLongPress = (city: City) => {
+    if (!isMultiselect) {
+      setSelectedCities([city]);
+      setIsMultiselect(true);
+    }
+  };
+
+  const handleQuitMultiselect = () => {
+    setSelectedCities(undefined);
+    setIsMultiselect(false);
+    setShouldShowActionMenu(false);
+  };
+
+  const handleItemMenuPress = () => {
+    setShouldShowActionMenu(prev => !prev);
   };
 
   useEffect(() => {
@@ -193,28 +330,48 @@ export default function ListScreen({navigation}: Props) {
   useEffect(() => {
     if (isMultiselect) {
       navigation.setOptions({
-        headerLeft: () => <IconButton icon="close" />,
-        headerRight: () => <IconButton icon="more-vert" />,
+        headerLeft: () => (
+          <IconButton icon="close" onPress={handleQuitMultiselect} />
+        ),
+        headerTitle: () => (
+          <Header text={`Выбрано: ${selectedCities?.length}`} />
+        ),
+        headerRight: () => (
+          <IconButton icon="more-vert" onPress={handleItemMenuPress} />
+        ),
       });
     } else {
       navigation.setOptions({
         headerLeft: undefined,
+        headerTitle: () => <Header />,
         headerRight: undefined,
       });
     }
-  }, [navigation, isMultiselect]);
+  }, [navigation, isMultiselect, selectedCities?.length]);
 
   return (
     <View style={{flex: 1}}>
       <CustomList
         currentPage={currentPage}
         data={cityData}
+        selectedData={selectedCities}
         onItemPress={handleItemPress}
+        onItemLongPress={handleItemLongPress}
         onSearchSubmit={handleSearchSubmit}
         onRefresh={handleRefresh}
+        onModeChange={handleQuitMultiselect}
         actions={singleItemActions}
       />
       {isProcessing && <FullScreenLoader />}
+      {shouldShowActionMenu && (
+        <HeaderMenu
+          actions={
+            selectedCities?.length === 1
+              ? singleItemActions
+              : multipleItemActions
+          }
+        />
+      )}
     </View>
   );
 }

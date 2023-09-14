@@ -5,13 +5,7 @@ import {colors} from '../../../../constants/colors';
 export default function FullScreenLoader() {
   return (
     <View style={styles.loaderBackground}>
-      <ActivityIndicator
-        size="large"
-        color={colors.textColor}
-        style={{
-          transform: [{scale: 2}],
-        }}
-      />
+      <ActivityIndicator size="large" color={colors.textColor} />
     </View>
   );
 }

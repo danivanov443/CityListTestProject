@@ -19,19 +19,25 @@ import {colors} from '../../../../constants/colors';
 
 type Props = {
   data?: City[];
+  selectedData?: City[];
   currentPage: number;
   onItemPress?: (city: City) => void;
+  onItemLongPress?: (city: City) => void;
   onSearchSubmit?: (searchQuery?: string) => void;
   onRefresh?: () => void;
+  onModeChange?: () => void;
   actions?: CustomListAction[];
 };
 
 export default function CustomList({
   data,
+  selectedData,
   currentPage = 1,
   onItemPress,
+  onItemLongPress,
   onSearchSubmit,
   onRefresh,
+  onModeChange,
   actions,
 }: Props) {
   const [isSwipeList, setIsSwipeList] = useState(false);
@@ -39,6 +45,13 @@ export default function CustomList({
   const flatListRef = useRef<FlatList>(null);
   const swipeListRef = useRef<SwipeListView<City>>(null);
   const {isKeyboardVisible} = useKeyboard();
+
+  const selectedIds = selectedData?.map(value => value.id);
+
+  const handleModeChange = () => {
+    setIsSwipeList(prev => !prev);
+    onModeChange?.();
+  };
 
   const handleRefresh = () => {
     if (onRefresh) {
@@ -114,7 +127,8 @@ export default function CustomList({
         }}>
         <Switch
           value={isSwipeList}
-          onChange={() => setIsSwipeList(prev => !prev)}
+          onChange={handleModeChange}
+          style={{marginEnd: 8}}
         />
         <Text style={{color: colors.textColor, fontSize: 12}}>
           {`Режим: ${isSwipeList ? 'SwipeList' : 'FlatList'}`}
@@ -166,9 +180,11 @@ export default function CustomList({
             keyExtractor={(item: City) => item.id}
             renderItem={({item, index}) => (
               <CustomListItem
+                selected={selectedIds?.includes(item.id)}
                 index={(currentPage - 1) * PAGE_SIZE + index + 1}
                 city={item}
                 onPress={onItemPress}
+                onLongPress={onItemLongPress}
               />
             )}
           />
