@@ -1,46 +1,165 @@
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {Alert, View} from 'react-native';
 import {MainStackParamList} from '../../../App';
 import {getCities} from '../../api';
 import CustomList from './components/CustomList';
 import {PAGE_SIZE} from '../../constants/constants';
 import {City, CustomListAction} from '../../types';
 import IconButton from '../../components/IconButton';
+import FullScreenLoader from './components/FullScreenLoader';
+import Toast from 'react-native-toast-message';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'List'>;
 
 export default function ListScreen({navigation}: Props) {
   const [isMultiselect, setIsMultiselect] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [cityData, setCityData] = useState<City[]>();
   const [currentPage, setCurrentPage] = useState(1);
+
+  const placeholderAction = () =>
+    new Promise<void>(resolve => {
+      setTimeout(() => {
+        resolve();
+      }, Math.floor(Math.random() * 5 + 1) * 500);
+    });
+
+  const onCopyItemPress = (city: City, callback?: () => void) => {
+    setIsProcessing(true);
+    placeholderAction()
+      .then(() => {
+        console.log(`Элемент ${city.title} скопирован`);
+      })
+      .catch(() => {
+        Toast.show({
+          type: 'error',
+          text1: 'Ошибка копирования',
+          position: 'bottom',
+        });
+      })
+      .finally(() => {
+        setIsProcessing(false);
+        callback?.();
+      });
+  };
+
+  const onEditItemPress = (city: City, callback?: () => void) => {
+    setIsProcessing(true);
+    placeholderAction()
+      .then(() => {
+        console.log(`Элемент ${city.title} отредактирован`);
+      })
+      .catch(() => {
+        Toast.show({
+          type: 'error',
+          text1: 'Ошибка редактирования',
+          position: 'bottom',
+        });
+      })
+      .finally(() => {
+        setIsProcessing(false);
+        callback?.();
+      });
+  };
+
+  const onViewItemPress = (city: City, callback?: () => void) => {
+    setIsProcessing(true);
+    placeholderAction()
+      .then(() => {
+        console.log(`Элемент ${city.title} просмотрен`);
+      })
+      .catch(() => {
+        Toast.show({
+          type: 'error',
+          text1: 'Ошибка просмотра',
+          position: 'bottom',
+        });
+      })
+      .finally(() => {
+        setIsProcessing(false);
+        callback?.();
+      });
+  };
+
+  const onLikeItemPress = (city: City, callback?: () => void) => {
+    setIsProcessing(true);
+    placeholderAction()
+      .then(() => {
+        console.log(`Элемент ${city.title} добавлен в избранное`);
+      })
+      .catch(() => {
+        Toast.show({
+          type: 'error',
+          text1: 'Ошибка добавления в избранное',
+          position: 'bottom',
+        });
+      })
+      .finally(() => {
+        setIsProcessing(false);
+        callback?.();
+      });
+  };
+
+  const onDeleteItemPress = (city: City, callback?: () => void) => {
+    Alert.alert('Удалить элемент', `Вы точно хотите удалить ${city.title}?`, [
+      {
+        text: 'Нет',
+        onPress: () => {
+          callback?.();
+        },
+        style: 'cancel',
+      },
+      {
+        text: 'Да',
+        onPress: () => {
+          setIsProcessing(true);
+          placeholderAction()
+            .then(() => {
+              console.log(`Элемент ${city.title} удалён`);
+            })
+            .catch(() => {
+              Toast.show({
+                type: 'error',
+                text1: 'Ошибка удаления',
+                position: 'bottom',
+              });
+            })
+            .finally(() => {
+              setIsProcessing(false);
+              callback?.();
+            });
+        },
+      },
+    ]);
+  };
 
   const singleItemActions: CustomListAction[] = [
     {
       name: 'Copy',
       icon: 'content-copy',
-      onPress: () => console.log('Copy'),
+      onPress: onCopyItemPress,
     },
     {
       name: 'Edit',
       icon: 'edit',
-      onPress: () => console.log('Edit'),
+      onPress: onEditItemPress,
     },
     {
       name: 'View',
       icon: 'preview',
-      onPress: () => console.log('View'),
+      onPress: onViewItemPress,
     },
-    // {
-    //   name: 'Like',
-    //   icon: 'favorite',
-    //   onPress: () => console.log('Like'),
-    // },
-    // {
-    //   name: 'Delete',
-    //   icon: 'delete',
-    //   onPress: () => console.log('Delete'),
-    // },
+    {
+      name: 'Like',
+      icon: 'favorite',
+      onPress: onLikeItemPress,
+    },
+    {
+      name: 'Delete',
+      icon: 'delete',
+      onPress: onDeleteItemPress,
+    },
   ];
 
   const loadData = async (
@@ -95,6 +214,7 @@ export default function ListScreen({navigation}: Props) {
         onRefresh={handleRefresh}
         actions={singleItemActions}
       />
+      {isProcessing && <FullScreenLoader />}
     </View>
   );
 }

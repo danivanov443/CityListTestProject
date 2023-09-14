@@ -1,11 +1,15 @@
 import React from 'react';
 import {View} from 'react-native';
 import IconButton from '../../../../components/IconButton';
-import {CustomListAction} from '../../../../types';
+import {City, CustomListAction} from '../../../../types';
 
-type Props = {actions?: CustomListAction[]};
+type Props = {city: City; actions?: CustomListAction[]; callback?: () => void};
 
-export default function CustomListSwipeActions({actions}: Props) {
+export default function CustomListSwipeActions({
+  city,
+  actions,
+  callback,
+}: Props) {
   return (
     <View
       style={{
@@ -28,7 +32,9 @@ export default function CustomListSwipeActions({actions}: Props) {
             icon={action.icon}
             size={26}
             style={{margin: 0}}
-            onPress={action.onPress}
+            onPress={() => {
+              action.onPress?.(city, callback);
+            }}
           />
         </View>
       ))}

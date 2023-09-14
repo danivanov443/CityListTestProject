@@ -1,17 +1,11 @@
 import React from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-} from 'react-native';
+import {StyleSheet, Text, TouchableHighlight, View} from 'react-native';
 import {colors} from '../../../../constants/colors';
 import {City} from '../../../../types';
 
 type Props = {index: number; city: City; onPress?: (city: City) => void};
 
-export const ITEM_HEIGHT = Platform.OS === 'ios' ? 50 : 52;
+export const ITEM_HEIGHT = 50;
 
 export default function CustomListItem({index, city, onPress}: Props) {
   return (
@@ -37,6 +31,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   customListItemWrapper: {
+    height: ITEM_HEIGHT,
     paddingHorizontal: 8,
     backgroundColor: 'white',
   },

@@ -34,5 +34,5 @@ export type CityRaw = {
 export type CustomListAction = {
   name: string;
   icon: string;
-  onPress?: () => void;
+  onPress?: (city: City, callback?: () => void) => void;
 };

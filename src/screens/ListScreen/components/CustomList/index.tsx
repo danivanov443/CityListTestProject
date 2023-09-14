@@ -3,6 +3,7 @@ import {
   EmitterSubscription,
   FlatList,
   Keyboard,
+  Switch,
   Text,
   View,
 } from 'react-native';
@@ -12,9 +13,9 @@ import CircularLoader from '../../../../components/CircularLoader';
 import CustomListItem, {ITEM_HEIGHT} from '../CustomListItem';
 import SearchBar from '../../../../components/SearchBar';
 import {useKeyboard} from '../../../../hooks/useKeyboard';
-import IconButton from '../../../../components/IconButton';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import CustomListSwipeActions from '../CustomListSwipeActions';
+import {colors} from '../../../../constants/colors';
 
 type Props = {
   data?: City[];
@@ -78,6 +79,10 @@ export default function CustomList({
     }
   };
 
+  const handleCloseSwipedItem = () => {
+    swipeListRef.current?.closeAllOpenRows();
+  };
+
   // const renderOnSwipeActions = (actions: any[]) => (
   //   <View style={{flexDirection: 'row'}}>
   //     {actions.map(action => (
@@ -100,13 +105,20 @@ export default function CustomList({
         onChangeText={setCurrentSearchQuery}
         onSearchSubmit={onTextInputSubmit}
       />
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <IconButton
-          icon={isSwipeList ? 'toggle-on' : 'toggle-off'}
-          size={22}
-          onPress={() => setIsSwipeList(prev => !prev)}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingBottom: 8,
+          paddingStart: 4,
+        }}>
+        <Switch
+          value={isSwipeList}
+          onChange={() => setIsSwipeList(prev => !prev)}
         />
-        <Text>{isSwipeList ? 'Режим SwipeList' : 'Режим FlatList'}</Text>
+        <Text style={{color: colors.textColor, fontSize: 12}}>
+          {`Режим: ${isSwipeList ? 'SwipeList' : 'FlatList'}`}
+        </Text>
       </View>
       {data?.length ? (
         isSwipeList ? (
@@ -129,8 +141,12 @@ export default function CustomList({
                 onPress={onItemPress}
               />
             )}
-            renderHiddenItem={(_data, _rowMap) => (
-              <CustomListSwipeActions actions={actions} />
+            renderHiddenItem={(data, _rowMap) => (
+              <CustomListSwipeActions
+                city={data.item}
+                actions={actions}
+                callback={handleCloseSwipedItem}
+              />
             )}
             disableRightSwipe
             rightOpenValue={actions ? -40 * actions?.length - 5 : 0}
