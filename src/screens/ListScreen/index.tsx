@@ -298,6 +298,7 @@ export default function ListScreen({navigation}: Props) {
   };
 
   const handleSearchSubmit = (searchQuery?: string) => {
+    handleQuitMultiselect();
     setCurrentPage(1);
     loadInitialData(searchQuery, 1, PAGE_SIZE);
   };
