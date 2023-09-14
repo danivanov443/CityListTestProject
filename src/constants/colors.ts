@@ -1,10 +1,11 @@
 export const colors = {
   bgColor: '#EEEEEE',
   lightGrey: '#DDDDDD',
-  mediumGrey: '#777777',
-  darkGrey: '#333333',
-  selectedBg: '#8888AA',
+  mediumGrey: '#999999',
+  darkGrey: '#888888',
+  selectedBg: '#BBBBBB',
   icon: '#444444',
   textColor: '#222222',
   error: '#FA4F4A',
+  loader: '#61D121',
 };

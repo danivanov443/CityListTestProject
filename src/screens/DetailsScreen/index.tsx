@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect} from 'react';
 import {View} from 'react-native';

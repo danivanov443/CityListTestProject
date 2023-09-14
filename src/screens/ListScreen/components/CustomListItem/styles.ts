@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   selectedItem: {
-    borderColor: colors.darkGrey,
+    borderColor: colors.mediumGrey,
   },
   customListItemWrapper: {
     height: ITEM_HEIGHT,

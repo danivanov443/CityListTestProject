@@ -24,7 +24,7 @@ export default function CustomListItem({
   return (
     <TouchableHighlight
       activeOpacity={1}
-      underlayColor={selected ? colors.lightGrey : colors.mediumGrey}
+      underlayColor={selected ? colors.lightGrey : colors.darkGrey}
       onPress={() => onPress?.(city)}
       onLongPress={() => onLongPress?.(city)}
       style={[

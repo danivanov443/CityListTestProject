@@ -9,15 +9,6 @@ export const styles = StyleSheet.create({
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
   },
-  progressBarWrapper: {
-    marginHorizontal: 8,
-  },
-  progressBarHide: {
-    opacity: 0,
-  },
-  progressBarShow: {
-    opacity: 1,
-  },
   switchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -15,8 +15,8 @@ import SearchBar from '../../../../components/SearchBar';
 import {useKeyboard} from '../../../../hooks/useKeyboard';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import CustomListSwipeActions from '../CustomListSwipeActions';
-import {ProgressBar} from '@react-native-community/progress-bar-android';
 import {styles} from './styles';
+import HorizontalLoader from '../../../../components/HorizontalLoader';
 
 type Props = {
   data?: City[];
@@ -108,15 +108,7 @@ export default function CustomList({
         onChangeText={setCurrentSearchQuery}
         onSearchSubmit={onTextInputSubmit}
       />
-      <View style={styles.progressBarWrapper}>
-        <ProgressBar
-          indeterminate
-          styleAttr="Horizontal"
-          style={
-            showProgressBar ? styles.progressBarShow : styles.progressBarHide
-          }
-        />
-      </View>
+      <HorizontalLoader isHidden={!showProgressBar} />
       <View style={styles.switchWrapper}>
         <Switch
           value={isSwipeList}
