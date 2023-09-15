@@ -29,6 +29,7 @@ export const styles = StyleSheet.create({
     marginEnd: 8,
   },
   titleText: {
+    flex: 1,
     fontSize: 14,
     color: colors.textColor,
   },

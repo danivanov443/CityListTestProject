@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Text, TouchableHighlight, View} from 'react-native';
 
 import {colors} from '@themes/themes';
@@ -36,6 +36,12 @@ export default function CustomListItem({
     onToggleMultiselect?.();
   }, [isMultiselect, onToggleMultiselect]);
 
+  useEffect(() => {
+    if (!isMultiselect) {
+      setIsSelected(false);
+    }
+  }, [isMultiselect]);
+
   return (
     <TouchableHighlight
       activeOpacity={1}
@@ -58,7 +64,9 @@ export default function CustomListItem({
           isMultiselect ? !isSelected && styles.selectedItem : undefined,
         ]}>
         <Text style={styles.indexText}>{`${index}.`}</Text>
-        <Text style={styles.titleText}>{city.title}</Text>
+        <Text style={styles.titleText} numberOfLines={1}>
+          {city.title}
+        </Text>
       </View>
     </TouchableHighlight>
   );

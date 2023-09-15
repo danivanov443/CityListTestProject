@@ -7,6 +7,7 @@ import {
   Switch,
   Text,
   View,
+  ViewToken,
 } from 'react-native';
 
 import {RowMap, SwipeListView} from 'react-native-swipe-list-view';
@@ -49,6 +50,7 @@ export default function CustomList({
 }: Props) {
   const [isSwipeList, setIsSwipeList] = useState(false);
   const [currentSearchQuery, setCurrentSearchQuery] = useState<string>();
+  const [currentScrollIndex, setCurrentScrollIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
   const swipeListRef = useRef<SwipeListView<City>>(null);
   const {isKeyboardVisible} = useKeyboard();
@@ -150,6 +152,23 @@ export default function CustomList({
     [actions],
   );
 
+  const handleViewableItemsChanged = useCallback(
+    (info: {viewableItems: ViewToken[]; changed: ViewToken[]}) => {
+      if (info?.viewableItems[0]?.index) {
+        setCurrentScrollIndex(info?.viewableItems[0]?.index);
+      }
+    },
+    [],
+  );
+
+  const viewabilityConfig = useMemo(
+    () => ({
+      minimumViewTime: 150,
+      itemVisiblePercentThreshold: 50,
+    }),
+    [],
+  );
+
   const customListContent = useMemo(() => {
     if (!data) {
       return <CircularLoader />;
@@ -160,6 +179,9 @@ export default function CustomList({
     if (isSwipeList) {
       return (
         <SwipeListView
+          onViewableItemsChanged={handleViewableItemsChanged}
+          initialScrollIndex={currentScrollIndex}
+          viewabilityConfig={viewabilityConfig}
           style={styles.list}
           ref={swipeListRef}
           data={data}
@@ -178,6 +200,9 @@ export default function CustomList({
     }
     return (
       <FlatList
+        onViewableItemsChanged={handleViewableItemsChanged}
+        initialScrollIndex={currentScrollIndex}
+        viewabilityConfig={viewabilityConfig}
         style={styles.list}
         ref={flatListRef}
         data={data}
@@ -192,14 +217,17 @@ export default function CustomList({
     );
   }, [
     actions,
+    currentScrollIndex,
     data,
     getItemLayout,
     handleEndReached,
     handleRefresh,
+    handleViewableItemsChanged,
     isSwipeList,
     keyExtractor,
     renderHiddenItem,
     renderItem,
+    viewabilityConfig,
   ]);
 
   return (

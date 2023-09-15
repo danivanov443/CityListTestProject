@@ -10,7 +10,6 @@ import {MainStackParamList} from '@navigation/navigation';
 import {City, CustomListAction} from '@src/types';
 import {PAGE_SIZE} from '@constants/constants';
 import IconButton from '@components/IconButton';
-import Header from '@components/Header';
 import CustomList from './components/CustomList';
 import FullScreenLoader from './components/FullScreenLoader';
 import HeaderMenu from './components/HeaderMenu';
@@ -370,9 +369,7 @@ export default function ListScreen({navigation}: Props) {
         headerLeft: () => (
           <IconButton icon="close" onPress={handleQuitMultiselect} />
         ),
-        headerTitle: () => (
-          <Header text={`Выбрано: ${selectedCities?.length}`} />
-        ),
+        headerTitle: `Выбрано: ${selectedCities?.length}`,
         headerRight: () => (
           <IconButton icon="more-vert" onPress={handleItemMenuPress} />
         ),
@@ -380,7 +377,7 @@ export default function ListScreen({navigation}: Props) {
     } else {
       navigation.setOptions({
         headerLeft: undefined,
-        headerTitle: () => <Header />,
+        headerTitle: 'City List',
         headerRight: undefined,
       });
     }
