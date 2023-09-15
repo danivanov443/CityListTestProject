@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, View, BackHandler} from 'react-native';
 
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -51,6 +51,7 @@ export default function ListScreen({navigation}: Props) {
       })
       .finally(() => {
         setIsProcessing(false);
+        handleQuitMultiselect();
         callback?.();
       });
   };
@@ -73,6 +74,7 @@ export default function ListScreen({navigation}: Props) {
       })
       .finally(() => {
         setIsProcessing(false);
+        handleQuitMultiselect();
         callback?.();
       });
   };
@@ -95,6 +97,7 @@ export default function ListScreen({navigation}: Props) {
       })
       .finally(() => {
         setIsProcessing(false);
+        handleQuitMultiselect();
         callback?.();
       });
   };
@@ -117,6 +120,7 @@ export default function ListScreen({navigation}: Props) {
       })
       .finally(() => {
         setIsProcessing(false);
+        handleQuitMultiselect();
         callback?.();
       });
   };
@@ -150,6 +154,7 @@ export default function ListScreen({navigation}: Props) {
             })
             .finally(() => {
               setIsProcessing(false);
+              handleQuitMultiselect();
               callback?.();
             });
         },
@@ -213,6 +218,7 @@ export default function ListScreen({navigation}: Props) {
       })
       .finally(() => {
         setIsProcessing(false);
+        handleQuitMultiselect();
         callback?.();
       });
   };
@@ -249,6 +255,7 @@ export default function ListScreen({navigation}: Props) {
               })
               .finally(() => {
                 setIsProcessing(false);
+                handleQuitMultiselect();
                 callback?.();
               });
           },
@@ -331,11 +338,13 @@ export default function ListScreen({navigation}: Props) {
     }
   };
 
-  const handleQuitMultiselect = () => {
-    setSelectedCities(undefined);
-    setIsMultiselect(false);
-    setShouldShowActionMenu(false);
-  };
+  const handleQuitMultiselect = useCallback(() => {
+    if (isMultiselect) {
+      setSelectedCities(undefined);
+      setIsMultiselect(false);
+      setShouldShowActionMenu(false);
+    }
+  }, [isMultiselect]);
 
   const handleItemMenuPress = () => {
     setShouldShowActionMenu(prev => !prev);
@@ -361,7 +370,7 @@ export default function ListScreen({navigation}: Props) {
     );
 
     return () => subscription.remove();
-  }, [isMultiselect]);
+  }, [handleQuitMultiselect, isMultiselect]);
 
   useEffect(() => {
     if (isMultiselect) {
@@ -381,7 +390,12 @@ export default function ListScreen({navigation}: Props) {
         headerRight: undefined,
       });
     }
-  }, [navigation, isMultiselect, selectedCities?.length]);
+  }, [
+    navigation,
+    isMultiselect,
+    selectedCities?.length,
+    handleQuitMultiselect,
+  ]);
 
   return (
     <View style={styles.listScreenView}>
