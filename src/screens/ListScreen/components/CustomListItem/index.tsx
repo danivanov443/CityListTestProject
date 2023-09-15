@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {Text, TouchableHighlight, View} from 'react-native';
 
 import {colors} from '@themes/themes';
@@ -8,31 +8,55 @@ import {styles} from './styles';
 type Props = {
   index: number;
   city: City;
-  selected?: boolean;
-  onPress?: () => void;
-  onLongPress?: () => void;
+  isMultiselect?: boolean;
+  onSelect?: () => void;
+  onToggleMultiselect?: () => void;
 };
-
-export const ITEM_HEIGHT = 50;
 
 export default function CustomListItem({
   index,
   city,
-  selected = true,
-  onPress,
-  onLongPress,
+  isMultiselect = false,
+  onSelect,
+  onToggleMultiselect,
 }: Props) {
+  const [isSelected, setIsSelected] = useState(false);
+
+  const handlePress = useCallback(() => {
+    if (isMultiselect) {
+      setIsSelected(prev => !prev);
+    }
+    onSelect?.();
+  }, [isMultiselect, onSelect]);
+
+  const handleLongPress = useCallback(() => {
+    if (!isMultiselect) {
+      setIsSelected(prev => !prev);
+    }
+    onToggleMultiselect?.();
+  }, [isMultiselect, onToggleMultiselect]);
+
   return (
     <TouchableHighlight
       activeOpacity={1}
-      underlayColor={selected ? colors.lightGrey : colors.darkGrey}
-      onPress={onPress}
-      onLongPress={onLongPress}
+      underlayColor={
+        isMultiselect
+          ? isSelected
+            ? colors.lightGrey
+            : colors.darkGrey
+          : colors.lightGrey
+      }
+      onPress={handlePress}
+      onLongPress={handleLongPress}
       style={[
         styles.customListItemWrapper,
-        !selected && styles.selectedItemWrapper,
+        isMultiselect ? !isSelected && styles.selectedItemWrapper : undefined,
       ]}>
-      <View style={[styles.customListItem, !selected && styles.selectedItem]}>
+      <View
+        style={[
+          styles.customListItem,
+          isMultiselect ? !isSelected && styles.selectedItem : undefined,
+        ]}>
         <Text style={styles.indexText}>{`${index}.`}</Text>
         <Text style={styles.titleText}>{city.title}</Text>
       </View>

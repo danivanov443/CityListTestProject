@@ -1,9 +1,12 @@
 import {StyleSheet} from 'react-native';
 
+import {ITEM_HEIGHT} from '@constants/constants';
+
 export const styles = StyleSheet.create({
   swipeActionsBg: {
     flexDirection: 'row',
     flex: 1,
+    height: ITEM_HEIGHT,
     justifyContent: 'flex-end',
     alignItems: 'center',
   },

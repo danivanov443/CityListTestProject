@@ -389,9 +389,8 @@ export default function ListScreen({navigation}: Props) {
   return (
     <View style={styles.listScreenView}>
       <CustomList
-        currentPage={currentPage}
         data={cityData}
-        selectedData={selectedCities}
+        isMultiselect={isMultiselect}
         actions={singleItemActions}
         showProgressBar={isFetchingMore}
         onItemPress={handleItemPress}

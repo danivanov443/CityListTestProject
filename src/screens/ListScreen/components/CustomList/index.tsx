@@ -12,20 +12,19 @@ import {
 import {RowMap, SwipeListView} from 'react-native-swipe-list-view';
 
 import {City, CustomListAction} from '@src/types';
-import {PAGE_SIZE} from '@constants/constants';
+import {ITEM_HEIGHT} from '@constants/constants';
 import CircularLoader from '@components/CircularLoader';
 import HorizontalLoader from '@components/HorizontalLoader';
 import SearchBar from '@components/SearchBar';
 import {useKeyboard} from '@hooks/useKeyboard';
 import {styles} from './styles';
-import CustomListItem, {ITEM_HEIGHT} from '../CustomListItem';
+import CustomListItem from '../CustomListItem';
 import CustomListSwipeActions from '../CustomListSwipeActions';
 import NoResults from '../NoResults';
 
 type Props = {
   data?: City[];
-  selectedData?: City[];
-  currentPage: number;
+  isMultiselect: boolean;
   actions?: CustomListAction[];
   showProgressBar?: boolean;
   onItemPress?: (city: City) => void;
@@ -38,8 +37,7 @@ type Props = {
 
 export default function CustomList({
   data,
-  selectedData,
-  currentPage = 1,
+  isMultiselect = false,
   actions,
   showProgressBar,
   onItemPress,
@@ -54,8 +52,6 @@ export default function CustomList({
   const flatListRef = useRef<FlatList>(null);
   const swipeListRef = useRef<SwipeListView<City>>(null);
   const {isKeyboardVisible} = useKeyboard();
-
-  const selectedIds = selectedData?.map(value => value.id);
 
   const handleModeChange = useCallback(() => {
     setIsSwipeList(prev => !prev);
@@ -79,7 +75,7 @@ export default function CustomList({
       const searchNumber = Number(trimmedSearchQuery);
 
       const minLimit = 1;
-      const maxLimit = currentPage * PAGE_SIZE;
+      const maxLimit = data?.length ?? 0;
 
       if (
         searchNumber >= minLimit &&
@@ -109,7 +105,7 @@ export default function CustomList({
         onSearchSubmit?.(trimmedSearchQuery);
       }
     },
-    [currentPage, isKeyboardVisible, isSwipeList, onSearchSubmit],
+    [data?.length, isKeyboardVisible, isSwipeList, onSearchSubmit],
   );
 
   const handleCloseSwipedItem = () => {
@@ -130,14 +126,16 @@ export default function CustomList({
   const renderItem = useCallback(
     ({item, index}: {item: City; index: number}) => (
       <CustomListItem
-        selected={isSwipeList ? undefined : selectedIds?.includes(item.id)}
+        isMultiselect={isMultiselect}
         index={index + 1}
         city={item}
-        onPress={() => onItemPress?.(item)}
-        onLongPress={isSwipeList ? undefined : () => onItemLongPress?.(item)}
+        onSelect={() => onItemPress?.(item)}
+        onToggleMultiselect={
+          isSwipeList ? undefined : () => onItemLongPress?.(item)
+        }
       />
     ),
-    [isSwipeList, onItemLongPress, onItemPress, selectedIds],
+    [isSwipeList, onItemLongPress, onItemPress, isMultiselect],
   );
 
   const renderHiddenItem = useCallback(
@@ -169,7 +167,7 @@ export default function CustomList({
           onRefresh={handleRefresh}
           refreshing={false}
           onEndReached={handleEndReached}
-          onEndReachedThreshold={2}
+          onEndReachedThreshold={1}
           keyExtractor={keyExtractor}
           renderItem={renderItem}
           renderHiddenItem={renderHiddenItem}
@@ -186,7 +184,7 @@ export default function CustomList({
         getItemLayout={getItemLayout}
         onRefresh={handleRefresh}
         onEndReached={handleEndReached}
-        onEndReachedThreshold={2}
+        onEndReachedThreshold={1}
         refreshing={false}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
