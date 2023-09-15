@@ -1,11 +1,13 @@
 import React from 'react';
+
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
-import ListScreen from './src/screens/ListScreen';
-import DetailScreen from './src/screens/DetailsScreen';
-import {toastConfig} from './src/toastConfig';
-import {MainStackParamList} from './src/navigation/navigation';
+
+import ListScreen from '@screens/ListScreen';
+import DetailScreen from '@screens/DetailsScreen';
+import {toastConfig} from '@src/toastConfig';
+import {MainStackParamList} from '@navigation/navigation';
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
