@@ -1,5 +1,6 @@
 import {StyleSheet} from 'react-native';
-import {colors} from '../../../../constants/colors';
+
+import {colors} from '@themes/themes';
 
 export const styles = StyleSheet.create({
   customListWrapper: {

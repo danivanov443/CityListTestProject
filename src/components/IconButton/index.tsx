@@ -1,7 +1,9 @@
 import React from 'react';
 import {StyleProp, TouchableOpacity, View, ViewStyle} from 'react-native';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {colors} from '../../constants/colors';
+
+import {colors} from '@themes/themes';
 import {styles} from './styles';
 
 type Props = {

@@ -1,6 +1,7 @@
 import {StyleSheet} from 'react-native';
 import {ITEM_HEIGHT} from '.';
-import {colors} from '../../../../constants/colors';
+
+import {colors} from '@themes/themes';
 
 export const styles = StyleSheet.create({
   customListItem: {

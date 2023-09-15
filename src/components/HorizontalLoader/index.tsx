@@ -1,7 +1,9 @@
 import React from 'react';
 import {Dimensions, View} from 'react-native';
+
 import {Bar} from 'react-native-progress';
-import {colors} from '../../constants/colors';
+
+import {colors} from '@themes/themes';
 import {styles} from './styles';
 
 const HORIZONTAL_MARGIN = 16;

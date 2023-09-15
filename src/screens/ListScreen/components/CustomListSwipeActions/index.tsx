@@ -1,7 +1,8 @@
 import React from 'react';
 import {View} from 'react-native';
-import IconButton from '../../../../components/IconButton';
-import {City, CustomListAction} from '../../../../types';
+
+import IconButton from '@components/IconButton';
+import {City, CustomListAction} from '@src/types';
 import {styles} from './styles';
 
 type Props = {city: City; actions?: CustomListAction[]; callback?: () => void};

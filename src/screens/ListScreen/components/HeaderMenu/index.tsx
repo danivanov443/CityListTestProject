@@ -1,6 +1,7 @@
 import React from 'react';
 import {Text, TouchableOpacity, View} from 'react-native';
-import {CustomListAction} from '../../../../types';
+
+import {CustomListAction} from '@src/types';
 import {styles} from './styles';
 
 type Props = {actions?: CustomListAction[]; callback?: () => void};

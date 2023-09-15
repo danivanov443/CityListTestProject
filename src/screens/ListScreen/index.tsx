@@ -1,18 +1,19 @@
 /* eslint-disable react/no-unstable-nested-components */
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect, useState} from 'react';
-import {Alert, View} from 'react-native';
-import {MainStackParamList} from '../../../App';
-import {getCities} from '../../api';
-import CustomList from './components/CustomList';
-import {PAGE_SIZE} from '../../constants/constants';
-import {City, CustomListAction} from '../../types';
-import IconButton from '../../components/IconButton';
-import FullScreenLoader from './components/FullScreenLoader';
+import {Alert, View, BackHandler} from 'react-native';
+
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
-import Header from '../../components/Header/Header';
+
+import {getCities} from '@api/api';
+import {MainStackParamList} from '@navigation/navigation';
+import {City, CustomListAction} from '@src/types';
+import {PAGE_SIZE} from '@constants/constants';
+import IconButton from '@components/IconButton';
+import Header from '@components/Header';
+import CustomList from './components/CustomList';
+import FullScreenLoader from './components/FullScreenLoader';
 import HeaderMenu from './components/HeaderMenu';
-import {BackHandler} from 'react-native';
 import {styles} from './styles';
 
 type Props = NativeStackScreenProps<MainStackParamList, 'List'>;

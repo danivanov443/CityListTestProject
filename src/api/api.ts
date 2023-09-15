@@ -1,7 +1,8 @@
 import axios, {AxiosResponse} from 'axios';
 import Toast from 'react-native-toast-message';
-import {City, CityRaw} from '../types';
-import getCityFromCityRaw from '../utils/getCityFromCityRaw';
+
+import {City, CityRaw} from '@src/types';
+import getCityFromCityRaw from '@utils/getCityFromCityRaw';
 
 interface RequestParams {
   [key: string]: string | number | boolean | undefined;

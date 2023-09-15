@@ -1,5 +1,6 @@
-import {colors} from '../../../../constants/colors';
 import {StyleSheet} from 'react-native';
+
+import {colors} from '@themes/themes';
 
 export const styles = StyleSheet.create({
   noResultsBackground: {

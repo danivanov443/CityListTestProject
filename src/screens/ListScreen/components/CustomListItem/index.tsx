@@ -1,7 +1,8 @@
 import React from 'react';
 import {Text, TouchableHighlight, View} from 'react-native';
-import {colors} from '../../../../constants/colors';
-import {City} from '../../../../types';
+
+import {colors} from '@themes/themes';
+import {City} from '@src/types';
 import {styles} from './styles';
 
 type Props = {

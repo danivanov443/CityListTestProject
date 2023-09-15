@@ -1,9 +1,11 @@
 /* eslint-disable react/no-unstable-nested-components */
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import React, {useEffect} from 'react';
 import {View} from 'react-native';
-import {MainStackParamList} from '../../../App';
-import Header from '../../components/Header/Header';
+
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+
+import {MainStackParamList} from '@navigation/navigation';
+import Header from '@components/Header';
 import CityDetails from './components/CityDetails';
 import {styles} from './styles';
 

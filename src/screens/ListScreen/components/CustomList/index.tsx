@@ -7,16 +7,18 @@ import {
   Text,
   View,
 } from 'react-native';
-import {PAGE_SIZE} from '../../../../constants/constants';
-import {City, CustomListAction} from '../../../../types';
-import CircularLoader from '../../../../components/CircularLoader';
-import CustomListItem, {ITEM_HEIGHT} from '../CustomListItem';
-import SearchBar from '../../../../components/SearchBar';
-import {useKeyboard} from '../../../../hooks/useKeyboard';
+
 import {SwipeListView} from 'react-native-swipe-list-view';
-import CustomListSwipeActions from '../CustomListSwipeActions';
+
+import {City, CustomListAction} from '@src/types';
+import {PAGE_SIZE} from '@constants/constants';
+import CircularLoader from '@components/CircularLoader';
+import HorizontalLoader from '@components/HorizontalLoader';
+import SearchBar from '@components/SearchBar';
+import {useKeyboard} from '@hooks/useKeyboard';
 import {styles} from './styles';
-import HorizontalLoader from '../../../../components/HorizontalLoader';
+import CustomListItem, {ITEM_HEIGHT} from '../CustomListItem';
+import CustomListSwipeActions from '../CustomListSwipeActions';
 import NoResults from '../NoResults';
 
 type Props = {

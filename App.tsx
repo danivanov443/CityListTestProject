@@ -5,14 +5,9 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
 import ListScreen from './src/screens/ListScreen';
 import DetailScreen from './src/screens/DetailsScreen';
-import Header from './src/components/Header/Header';
-import {City} from './src/types';
+import Header from './src/components/Header';
 import {toastConfig} from './src/toastConfig';
-
-export type MainStackParamList = {
-  List: undefined;
-  Details: {city: City};
-};
+import {MainStackParamList} from './src/navigation/navigation';
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 

@@ -1,7 +1,9 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
+
 import {BaseToast, BaseToastProps} from 'react-native-toast-message';
-import {colors} from './constants/colors';
+
+import {colors} from '@themes/themes';
 
 export const toastConfig = {
   error: (props: BaseToastProps) => (

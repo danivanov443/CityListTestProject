@@ -1,7 +1,8 @@
 import React from 'react';
 import {View, Text} from 'react-native';
-import {City} from '../../../../types';
-import getAddressWithoutCity from '../../../../utils/getAddressWithoutCity';
+
+import {City} from '@src/types';
+import getAddressWithoutCity from '@utils/getAddressWithoutCity';
 import {styles} from './styles';
 
 type Props = {city: City};

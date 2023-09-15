@@ -1,6 +1,7 @@
 import React from 'react';
 import {ActivityIndicator, View} from 'react-native';
-import {colors} from '../../constants/colors';
+
+import {colors} from '@themes/themes';
 import {styles} from './styles';
 
 export default function CircularLoader() {
