@@ -288,14 +288,16 @@ export default function ListScreen({navigation}: Props) {
   };
 
   const handleEndReached = async (searchQuery?: string) => {
-    setIsFetchingMore(true);
-    const data = await getCities(currentPage + 1, PAGE_SIZE, searchQuery);
+    if (!isFetchingMore) {
+      setIsFetchingMore(true);
+      const data = await getCities(currentPage + 1, PAGE_SIZE, searchQuery);
 
-    if (data) {
-      setCityData(prev => prev && [...prev, ...data]);
-      setCurrentPage(prev => prev + 1);
+      if (data) {
+        setCityData(prev => prev && [...prev, ...data]);
+        setCurrentPage(prev => prev + 1);
+      }
+      setIsFetchingMore(false);
     }
-    setIsFetchingMore(false);
   };
 
   const handleSearchSubmit = (searchQuery?: string) => {

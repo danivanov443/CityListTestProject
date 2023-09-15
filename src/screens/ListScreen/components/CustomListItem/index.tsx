@@ -9,8 +9,8 @@ type Props = {
   index: number;
   city: City;
   selected?: boolean;
-  onPress?: (city: City) => void;
-  onLongPress?: (city: City) => void;
+  onPress?: () => void;
+  onLongPress?: () => void;
 };
 
 export const ITEM_HEIGHT = 50;
@@ -26,8 +26,8 @@ export default function CustomListItem({
     <TouchableHighlight
       activeOpacity={1}
       underlayColor={selected ? colors.lightGrey : colors.darkGrey}
-      onPress={() => onPress?.(city)}
-      onLongPress={() => onLongPress?.(city)}
+      onPress={onPress}
+      onLongPress={onLongPress}
       style={[
         styles.customListItemWrapper,
         !selected && styles.selectedItemWrapper,

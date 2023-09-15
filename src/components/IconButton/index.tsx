@@ -10,16 +10,23 @@ type Props = {
   style?: StyleProp<ViewStyle>;
   icon: string;
   size?: number;
-  onPress?: () => void;
+  disabled?: boolean;
+  onPress: () => void;
 };
 
-export default function IconButton({style, icon, size = 26, onPress}: Props) {
+export default function IconButton({
+  style,
+  icon,
+  size = 26,
+  disabled = false,
+  onPress,
+}: Props) {
   return (
     <View style={[styles.iconButtonWrapper, style]}>
       <TouchableOpacity
         onPress={onPress}
         style={styles.iconButton}
-        disabled={!onPress}>
+        disabled={disabled}>
         <Icon name={icon} size={size} color={colors.icon} />
       </TouchableOpacity>
     </View>

@@ -2,16 +2,12 @@ import React from 'react';
 import {View} from 'react-native';
 
 import IconButton from '@components/IconButton';
-import {City, CustomListAction} from '@src/types';
+import {CustomListAction} from '@src/types';
 import {styles} from './styles';
 
-type Props = {city: City; actions?: CustomListAction[]; callback?: () => void};
+type Props = {actions?: CustomListAction[]; onPress: (...args: any[]) => void};
 
-export default function CustomListSwipeActions({
-  city,
-  actions,
-  callback,
-}: Props) {
+export default function CustomListSwipeActions({actions, onPress}: Props) {
   return (
     <View style={styles.swipeActionsBg}>
       {actions?.map(action => (
@@ -20,9 +16,7 @@ export default function CustomListSwipeActions({
             icon={action.icon}
             size={26}
             style={styles.swipeActionButton}
-            onPress={() => {
-              action.onPress?.(city, callback);
-            }}
+            onPress={() => onPress(action)}
           />
         </View>
       ))}

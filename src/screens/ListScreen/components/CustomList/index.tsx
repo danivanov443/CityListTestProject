@@ -1,14 +1,15 @@
-import React, {useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {
   EmitterSubscription,
   FlatList,
   Keyboard,
+  ListRenderItemInfo,
   Switch,
   Text,
   View,
 } from 'react-native';
 
-import {SwipeListView} from 'react-native-swipe-list-view';
+import {RowMap, SwipeListView} from 'react-native-swipe-list-view';
 
 import {City, CustomListAction} from '@src/types';
 import {PAGE_SIZE} from '@constants/constants';
@@ -56,60 +57,159 @@ export default function CustomList({
 
   const selectedIds = selectedData?.map(value => value.id);
 
-  const handleModeChange = () => {
+  const handleModeChange = useCallback(() => {
     setIsSwipeList(prev => !prev);
     onModeChange?.();
-  };
+  }, [onModeChange]);
 
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     if (onRefresh) {
       setCurrentSearchQuery(undefined);
       onRefresh();
     }
-  };
+  }, [onRefresh]);
 
-  const onTextInputSubmit = (searchQuery?: string) => {
-    const trimmedSearchQuery = searchQuery?.trim();
-    const searchNumber = Number(trimmedSearchQuery);
+  const handleEndReached = useCallback(() => {
+    onEndReached?.(currentSearchQuery);
+  }, [currentSearchQuery, onEndReached]);
 
-    const minLimit = 1;
-    const maxLimit = currentPage * PAGE_SIZE;
+  const onTextInputSubmit = useCallback(
+    (searchQuery?: string) => {
+      const trimmedSearchQuery = searchQuery?.trim();
+      const searchNumber = Number(trimmedSearchQuery);
 
-    if (searchNumber >= minLimit && searchNumber <= maxLimit && !isSwipeList) {
-      if (isKeyboardVisible) {
-        let keyboardSubscription: EmitterSubscription;
+      const minLimit = 1;
+      const maxLimit = currentPage * PAGE_SIZE;
 
-        const onKeyboardDidHide = () => {
-          keyboardSubscription.remove();
+      if (
+        searchNumber >= minLimit &&
+        searchNumber <= maxLimit &&
+        !isSwipeList
+      ) {
+        if (isKeyboardVisible) {
+          let keyboardSubscription: EmitterSubscription;
+
+          const onKeyboardDidHide = () => {
+            keyboardSubscription.remove();
+            flatListRef.current?.scrollToIndex({
+              index: searchNumber - 1,
+            });
+          };
+
+          keyboardSubscription = Keyboard.addListener(
+            'keyboardDidHide',
+            onKeyboardDidHide,
+          );
+        } else {
           flatListRef.current?.scrollToIndex({
             index: searchNumber - 1,
           });
-        };
-
-        keyboardSubscription = Keyboard.addListener(
-          'keyboardDidHide',
-          onKeyboardDidHide,
-        );
+        }
       } else {
-        flatListRef.current?.scrollToIndex({
-          index: searchNumber - 1,
-        });
+        onSearchSubmit?.(trimmedSearchQuery);
       }
-    } else {
-      onSearchSubmit?.(trimmedSearchQuery);
-    }
-  };
+    },
+    [currentPage, isKeyboardVisible, isSwipeList, onSearchSubmit],
+  );
 
   const handleCloseSwipedItem = () => {
     swipeListRef.current?.closeAllOpenRows();
   };
+
+  const getItemLayout = useCallback(
+    (_data: any, index: number) => ({
+      length: ITEM_HEIGHT,
+      offset: ITEM_HEIGHT * index,
+      index,
+    }),
+    [],
+  );
+
+  const keyExtractor = useCallback((item: City) => item.id, []);
+
+  const renderItem = useCallback(
+    ({item, index}: {item: City; index: number}) => (
+      <CustomListItem
+        selected={isSwipeList ? undefined : selectedIds?.includes(item.id)}
+        index={index + 1}
+        city={item}
+        onPress={() => onItemPress?.(item)}
+        onLongPress={isSwipeList ? undefined : () => onItemLongPress?.(item)}
+      />
+    ),
+    [isSwipeList, onItemLongPress, onItemPress, selectedIds],
+  );
+
+  const renderHiddenItem = useCallback(
+    (itemData: ListRenderItemInfo<City>, _rowMap: RowMap<City>) => (
+      <CustomListSwipeActions
+        actions={actions}
+        onPress={(action: CustomListAction) =>
+          action.onPress?.(itemData.item, handleCloseSwipedItem)
+        }
+      />
+    ),
+    [actions],
+  );
+
+  const customListContent = useMemo(() => {
+    if (!data) {
+      return <CircularLoader />;
+    }
+    if (data.length === 0) {
+      return <NoResults />;
+    }
+    if (isSwipeList) {
+      return (
+        <SwipeListView
+          style={styles.list}
+          ref={swipeListRef}
+          data={data}
+          getItemLayout={getItemLayout}
+          onRefresh={handleRefresh}
+          refreshing={false}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={2}
+          keyExtractor={keyExtractor}
+          renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
+          disableRightSwipe
+          rightOpenValue={actions ? -40 * actions?.length - 5 : 0}
+        />
+      );
+    }
+    return (
+      <FlatList
+        style={styles.list}
+        ref={flatListRef}
+        data={data}
+        getItemLayout={getItemLayout}
+        onRefresh={handleRefresh}
+        onEndReached={handleEndReached}
+        onEndReachedThreshold={2}
+        refreshing={false}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+      />
+    );
+  }, [
+    actions,
+    data,
+    getItemLayout,
+    handleEndReached,
+    handleRefresh,
+    isSwipeList,
+    keyExtractor,
+    renderHiddenItem,
+    renderItem,
+  ]);
 
   return (
     <View style={styles.customListWrapper}>
       <SearchBar
         value={currentSearchQuery}
         onChangeText={setCurrentSearchQuery}
-        onSearchSubmit={onTextInputSubmit}
+        onSubmitEditing={onTextInputSubmit}
       />
       <HorizontalLoader isHidden={!showProgressBar} />
       <View style={styles.switchWrapper}>
@@ -122,70 +222,7 @@ export default function CustomList({
           {`Режим: ${isSwipeList ? 'SwipeList' : 'FlatList'}`}
         </Text>
       </View>
-      {data?.length ? (
-        isSwipeList ? (
-          <SwipeListView
-            style={styles.list}
-            ref={swipeListRef}
-            data={data}
-            getItemLayout={(_data: any, index: number) => ({
-              length: ITEM_HEIGHT,
-              offset: ITEM_HEIGHT * index,
-              index,
-            })}
-            onRefresh={handleRefresh}
-            refreshing={false}
-            onEndReached={() => onEndReached?.(currentSearchQuery)}
-            onEndReachedThreshold={1}
-            keyExtractor={(item: City) => item.id}
-            renderItem={({item, index}) => (
-              <CustomListItem
-                index={index + 1}
-                city={item}
-                onPress={onItemPress}
-              />
-            )}
-            renderHiddenItem={(itemData, _rowMap) => (
-              <CustomListSwipeActions
-                city={itemData.item}
-                actions={actions}
-                callback={handleCloseSwipedItem}
-              />
-            )}
-            disableRightSwipe
-            rightOpenValue={actions ? -40 * actions?.length - 5 : 0}
-          />
-        ) : (
-          <FlatList
-            style={styles.list}
-            ref={flatListRef}
-            data={data}
-            getItemLayout={(_data, index) => ({
-              length: ITEM_HEIGHT,
-              offset: ITEM_HEIGHT * index,
-              index,
-            })}
-            onRefresh={handleRefresh}
-            onEndReached={() => onEndReached?.(currentSearchQuery)}
-            onEndReachedThreshold={1}
-            refreshing={false}
-            keyExtractor={(item: City) => item.id}
-            renderItem={({item, index}) => (
-              <CustomListItem
-                selected={selectedIds?.includes(item.id)}
-                index={index + 1}
-                city={item}
-                onPress={onItemPress}
-                onLongPress={onItemLongPress}
-              />
-            )}
-          />
-        )
-      ) : data?.length === 0 ? (
-        <NoResults />
-      ) : (
-        <CircularLoader />
-      )}
+      {customListContent}
     </View>
   );
 }
